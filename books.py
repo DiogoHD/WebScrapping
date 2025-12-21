@@ -1,8 +1,9 @@
+import time
+from urllib.parse import urljoin
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-import time
 
 start = time.time()
 
@@ -36,7 +37,7 @@ with requests.Session() as session:
         url = urljoin(url, next_link) if next_link else None
 
 df = pd.DataFrame(books)
-df.to_csv("books.csv", index=False)
+df.to_csv("data/books.csv", index=False)
 
 end = time.time()
 print(f"Scraping completed in {end - start:.2f} seconds.")

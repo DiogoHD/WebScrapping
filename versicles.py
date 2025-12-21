@@ -24,7 +24,7 @@ while url:
         versicle = a_tag.text.strip() if a_tag else ""
         
         if a_tag:
-            a_tag.extract()  # Remove o <a>
+            a_tag.decompose()  # Removes and deletes <a>
         
         content = p_tag.text.strip() if p_tag else ""
         
@@ -39,7 +39,7 @@ while url:
 session.close()
 
 df = pd.DataFrame(versicles)
-df.to_csv("versicles.csv", index=False)
+df.to_csv("data/versicles.csv", index=False)
 
 end = time.time()
 time_taken = end - start
