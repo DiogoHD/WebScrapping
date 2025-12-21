@@ -27,12 +27,15 @@ while url:
             "tags": ", ".join(tags),
         })
     
+    # Handle pagination
     next_button = soup.find("li", class_="next")
     next_link = next_button.find("a")["href"] if next_button else None
     url = urljoin(url, next_link) if next_link else None
 
+# Save to CSV
 df = pd.DataFrame(quotes)
 df.to_csv("data/quotesBasic.csv", index=False)
 
+# Print time taken
 end = time.time()
 print(f"Scraping completed in {end - start:.2f} seconds.")
