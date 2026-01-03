@@ -1,17 +1,16 @@
-import time
 from urllib.parse import urljoin
 
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-
-start = time.time()
+from tqdm import tqdm
 
 BASE_URL = "https://books.toscrape.com/"
 url = BASE_URL
 RATING_DICT = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
-books = []
+progress_bar = tqdm(desc="Scraping books", unit="page")
 
+books = []
 with requests.Session() as session:
     while url:
         res = session.get(url)
@@ -35,9 +34,10 @@ with requests.Session() as session:
         next_button = soup.find("li", class_="next")
         next_link = next_button.find("a")["href"] if next_button else None
         url = urljoin(url, next_link) if next_link else None
+        
+        progress_bar.update(1)
 
 df = pd.DataFrame(books)
 df.to_csv("data/books.csv", index=False)
 
-end = time.time()
-print(f"Scraping completed in {end - start:.2f} seconds.")
+progress_bar.close()

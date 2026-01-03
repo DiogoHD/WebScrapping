@@ -1,18 +1,16 @@
 import json
 import re
-import time
 
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-
-start = time.time()
+from tqdm import tqdm
+import time
 
 BASE_URL = "http://quotes.toscrape.com/js/"
 url = BASE_URL
 
 quotes = []
-
 res = requests.get(url)
 soup = BeautifulSoup(res.content, "lxml")
 
@@ -28,7 +26,7 @@ for s in scripts:
 match = re.search(r"var data = (\[.*?\]);", script, re.DOTALL)
 data = json.loads(match.group(1))
 
-for q in data:
+for q in tqdm(data, desc="Scraping quotes", unit="quote", ncols=100):
     quote = q["text"].strip('“”')
     author = q["author"]["name"]
     tags = q["tags"]
@@ -41,7 +39,3 @@ for q in data:
 # Save to CSV
 df = pd.DataFrame(quotes)
 df.to_csv("data/quotesJs.csv", index=False)
-
-# Print time taken
-end = time.time()
-print(f"Scraping completed in {end - start:.2f} seconds.")

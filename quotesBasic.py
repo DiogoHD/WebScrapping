@@ -1,14 +1,13 @@
-import time
 from urllib.parse import urljoin
 
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-
-start = time.time()
+from tqdm import tqdm
 
 BASE_URL = "http://quotes.toscrape.com/"
 url = BASE_URL
+progress_bar = tqdm(desc="Scraping quotes", unit="page")
 
 quotes = []
 while url:
@@ -31,11 +30,10 @@ while url:
     next_button = soup.find("li", class_="next")
     next_link = next_button.find("a")["href"] if next_button else None
     url = urljoin(url, next_link) if next_link else None
+    progress_bar.update(1)
 
 # Save to CSV
 df = pd.DataFrame(quotes)
 df.to_csv("data/quotesBasic.csv", index=False)
 
-# Print time taken
-end = time.time()
-print(f"Scraping completed in {end - start:.2f} seconds.")
+progress_bar.close()

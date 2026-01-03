@@ -2,18 +2,16 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import pandas as pd
-import time
-
-start = time.time()
+from tqdm import tqdm
 
 BASE_URL = "https://www.bibliaon.com/versiculos_biblicos/"
 url = BASE_URL
 session = requests.Session()
+progress_bar = tqdm(desc="Scraping versicles", unit="page")
 
 versicles = []
 while url:
     res = session.get(url)
-    print(url)
     soup = BeautifulSoup(res.content, "lxml")
     
     versicles_soup = soup.find_all("div", class_="destaque versiculo-card")
@@ -35,17 +33,11 @@ while url:
     
     next_button = soup.find("a", class_="paginacao-next")
     url = urljoin(url, next_button["href"]) if next_button else None
+    
+    progress_bar.update(1)
 
+progress_bar.close()
 session.close()
 
 df = pd.DataFrame(versicles)
 df.to_csv("data/versicles.csv", index=False)
-
-end = time.time()
-time_taken = end - start
-if time_taken > 120:
-    minutes = time_taken // 60
-    seconds = time_taken % 60
-    print(f"Scraping completed in {int(minutes)} minutes and {seconds:.2f} seconds.")
-else:
-    print(f"Scraping completed in {time_taken:.2f} seconds.")

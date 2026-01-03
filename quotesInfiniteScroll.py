@@ -1,9 +1,9 @@
-import time
+from tqdm import tqdm
 
 import pandas as pd
 import requests
 
-start = time.time()
+progress_bar = tqdm(desc="Scraping quotes", unit="page")
 
 session = requests.Session()
 page = 1
@@ -28,9 +28,10 @@ while True:
         break
     
     page += 1
+    progress_bar.update(1)
 
 df = pd.DataFrame(quotes)
 df.to_csv("data/quotesScroll.csv", index=False)
 
-end = time.time()
-print(f"Scraping completed in {end - start:.2f} seconds.")
+progress_bar.close()
+session.close()
